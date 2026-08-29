@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maven 父工程（聚合 + 依赖版本管理）
+  作用：
+  1. <modules> 聚合所有子模块，一条 mvn 命令构建整个工程
+  2. <dependencyManagement> 统一锁定第三方依赖版本，子模块引依赖时不写版本号，
+     从根源上避免"版本冲突"（这是微服务项目最常见的坑之一）
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>microservices</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>microservices</name>
+    <description>电商微服务学习项目：从单体到微服务架构演进</description>
+
+    <!-- 当前阶段的子模块，后续模块会逐步追加 gateway-service / auth-service -->
+    <modules>
+        <module>common</module>
+        <module>user-service</module>
+        <module>order-service</module>
+    </modules>
+
+    <properties>
+        <!-- 编译目标 17：本机 JDK 21 完全可以编译运行 17 字节码 -->
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <!-- 保留方法参数名：Spring MVC 的 @PathVariable/@RequestParam 不写名字时依赖它。
+             官方 spring-boot-starter-parent 默认开启，自定义父工程必须自己加，
+             否则运行时报 "parameter name information not available via reflection" -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- 三件套版本：Spring Boot 官方公布的兼容组合 -->
+        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- BOM 1：Spring Boot 全家桶版本 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- BOM 2：Spring Cloud 版本（模块 01 起用到） -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- BOM 3：Spring Cloud Alibaba 版本（Nacos/Sentinel/Seata 等用） -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- 工程内部模块：common 被各服务引用，版本也在这里统一 -->
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Spring Boot 打包插件：repackage 把普通 jar 重打包为可执行 fat-jar。
+                     注意：没有继承 spring-boot-starter-parent 时，repackage 必须显式声明，
+                     否则打出的 jar 没有 Main-Class，java -jar 会报"没有主清单属性" -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

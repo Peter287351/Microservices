@@ -1,0 +1,36 @@
+# docker-compose：本项目所有中间件的"一键启停"清单。
+# 随学习模块推进会不断追加新服务（Nacos、Sentinel、Zipkin、RocketMQ、Seata…）。
+# 当前（模块 00）：只有 MySQL。
+#
+# 常用命令（在仓库根目录执行）：
+#   docker compose -f docker/docker-compose.yml up -d      # 后台启动
+#   docker compose -f docker/docker-compose.yml ps         # 查看状态
+#   docker compose -f docker/docker-compose.yml logs mysql # 看 MySQL 日志
+#   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
+
+services:
+  mysql:
+    image: mysql:8.0.36
+    container_name: micro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123      # 学习环境用简单密码，生产环境绝不能这样
+      MYSQL_DATABASE: micro             # 首次启动自动创建的业务数据库
+      TZ: Asia/Shanghai
+    ports:
+      - "3307:3306"                     # 宿主机 3307 → 容器 3306
+      # 本机 3306 已被 Windows 自带的 MySQL 服务占用，故映射到 3307 避开冲突
+    volumes:
+      - mysql-data:/var/lib/mysql       # 数据持久化：容器删除数据也不丢
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro   # 首次启动自动执行的初始化 SQL
+    command:
+      - --character-set-server=utf8mb4  # 字符集：支持中文和 emoji
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql-data:

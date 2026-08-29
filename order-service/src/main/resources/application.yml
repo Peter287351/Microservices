@@ -1,0 +1,23 @@
+# ===================================================================
+# order-service 配置文件（模块 00：纯单体版）
+# ===================================================================
+
+server:
+  port: 8082                # 订单服务端口，与用户服务 8081 区分开
+
+spring:
+  application:
+    name: order-service     # 服务名：模块 01 注册到 Nacos 时用它
+  datasource:
+    # 学习阶段两个服务共用 micro 库（表不同：t_user / t_order）；
+    # 真实微服务推荐"一服务一库"，模块 09 讨论
+    url: jdbc:mysql://localhost:3307/micro?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    # 容器 MySQL 映射到宿主机 3307（本机 3306 已被 Windows 自带 MySQL 占用）
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false

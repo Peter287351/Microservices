@@ -108,7 +108,7 @@ Microservices/
 | user-service | 8081 | 用户服务 |
 | order-service | 8082 | 订单服务 |
 | auth-service | 9000 | 授权服务器（模块 10 上线） |
-| MySQL | 3306 | 业务数据库 `micro`（Docker） |
+| MySQL（Docker） | 3307 | 业务数据库 `micro`；本机 3306 已被 Windows 自带 MySQL 占用，故映射到 3307 |
 | Nacos | 8848 / 9848 | 控制台 / gRPC（模块 01） |
 | Sentinel 控制台 | 8858 | 限流规则配置（模块 06） |
 | Zipkin | 9411 | 链路查询 UI（模块 07） |
