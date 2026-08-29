@@ -25,3 +25,7 @@ tmp/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---- 工具会话文件 ----
+.zcode/
+logs/
