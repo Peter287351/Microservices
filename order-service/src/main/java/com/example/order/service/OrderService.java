@@ -2,7 +2,10 @@ package com.example.order.service;
 
 import com.example.common.api.BusinessException;
 import com.example.common.api.ErrorCode;
+import com.example.common.api.Result;
+import com.example.order.client.UserClient;
 import com.example.order.dto.OrderCreateRequest;
+import com.example.order.dto.UserDTO;
 import com.example.order.entity.Order;
 import com.example.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -15,9 +18,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final UserClient userClient;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, UserClient userClient) {
         this.orderRepository = orderRepository;
+        this.userClient = userClient;
     }
 
     public Order getById(Long id) {
@@ -30,13 +35,16 @@ public class OrderService {
     }
 
     /**
-     * 下单（模块 00 单体版）：生成订单号 → 落库 → 返回。
+     * 下单（模块 03 微服务版）：先【跨进程】校验用户 → 生成订单号 → 落库。
      *
-     * TODO(模块 03 OpenFeign)：真正的电商下单必须先调 user-service 校验用户是否存在，
-     * 那时这里将变成跨服务调用，也是整条微服务链路最有意思的地方。
+     * validateUser() 那一行背后发生的事（详见 module-03 README 第③节）：
+     * Feign 动态代理 → 拿服务名查 Nacos（模块01的电话簿）→ LoadBalancer 选一个实例
+     * → 发 HTTP GET http://192.168.x.x:8081/users/{id} → 拿回 JSON 反序列化成 Result<UserDTO>
      */
     @Transactional
     public Order create(OrderCreateRequest request) {
+        validateUser(request.userId());
+
         Order order = new Order();
         order.setOrderNo(generateOrderNo());
         order.setUserId(request.userId());
@@ -44,6 +52,14 @@ public class OrderService {
         order.setAmount(request.amount());
         order.setStatus("CREATED");
         return orderRepository.save(order);
+    }
+
+    /** 远程校验用户：对方返回非 0 错误码或没数据，都视为"用户不存在" */
+    private void validateUser(Long userId) {
+        Result<UserDTO> response = userClient.getById(userId);
+        if (response.getCode() != ErrorCode.SUCCESS.getCode() || response.getData() == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     /** 生成订单号：时间戳 + 3 位随机数，够学习用；生产环境一般用雪花算法或发号器 */
