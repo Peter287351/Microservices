@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * 全局异常处理器：拦截所有 Controller 抛出的异常，统一转成 Result 结构返回。
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler {
     public Result<Void> handleNotReadable(HttpMessageNotReadableException e) {
         log.warn("请求体解析失败: {}", e.getMessage());
         return Result.fail(ErrorCode.BAD_REQUEST.getCode(), "请求体不是合法的 UTF-8 JSON");
+    }
+
+    /** 路径/查询参数类型不匹配（如 /users/abc 传字母给 Long）：发生在参数绑定阶段，请求没进 Controller 就挂了 */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Result<Void> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        log.warn("参数类型错误: {}", e.getMessage());
+        return Result.fail(ErrorCode.BAD_REQUEST.getCode(), "参数类型错误: " + e.getName());
     }
 
     /** 兜底：未预料到的异常，返回 500（完整堆栈只打在日志里，不暴露给前端） */
