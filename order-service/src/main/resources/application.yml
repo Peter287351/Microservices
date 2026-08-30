@@ -34,3 +34,12 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
+
+# ── 模块 07 新增：链路追踪 ─────────────────────────────────
+management:
+  tracing:
+    sampling:
+      probability: 1.0       # 采样率 1.0=全采（学习环境）；生产一般 0.1（10%），省存储
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans   # 追踪数据上报地址（Docker Zipkin）

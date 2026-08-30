@@ -34,3 +34,12 @@ spring:
       ddl-auto: update      # 启动时按实体类自动建表/更新表结构（学习用，生产禁用）
     show-sql: true          # 控制台打印 SQL，便于学习观察
     open-in-view: false     # 关闭 OSIV，避免数据库连接被视图层长期占用
+
+# ── 模块 07 新增：链路追踪 ─────────────────────────────────
+management:
+  tracing:
+    sampling:
+      probability: 1.0       # 采样率 1.0=全采（学习环境）；生产一般 0.1
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans

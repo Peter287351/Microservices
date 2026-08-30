@@ -9,6 +9,15 @@
 #   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
 
 services:
+  # ── 模块 07 新增：Zipkin 链路追踪 ────────────────────────────
+  # UI：http://localhost:9411
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: micro-zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"           # API + 查询 UI
+
   # ── 模块 06 新增：Sentinel 控制台 ────────────────────────────
   # 控制台：http://localhost:8858 （账号密码 sentinel/sentinel）
   sentinel-dashboard:

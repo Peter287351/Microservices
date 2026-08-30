@@ -6,6 +6,15 @@
 server:
   port: 8080
 
+# ── 模块 07 新增：链路追踪（trace 从大门就开始记录）─────────
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
 spring:
   application:
     name: gateway-service

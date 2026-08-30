@@ -61,7 +61,7 @@
 - [x] **module-03-openfeign-服务调用** —— 下单时远程校验用户
 - [x] **module-04-loadbalancer-负载均衡** —— 双实例演示轮询与权重
 - [x] **module-05-gateway-服务网关** —— 统一入口 8080，路由与过滤器
-- [ ] **module-06-sentinel-熔断降级** —— 限流、熔断、fallback 降级
+- [x] **module-06-sentinel-熔断降级** —— 限流、熔断、fallback 降级
 - [ ] **module-07-zipkin-链路追踪** —— 全链路 Trace 可视化
 - [ ] **module-08-stream-rocketmq-消息驱动** —— 下单事件异步解耦
 - [ ] **module-09-seata-分布式事务** —— 跨服务数据一致性
