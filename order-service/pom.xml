@@ -48,10 +48,16 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-        <!-- 声明式远程调用（模块 03）：OpenFeign，自带 LoadBalancer 依赖（模块04展开） -->
+        <!-- 声明式远程调用（模块 03）：OpenFeign。
+             坑（E03-1）：SC 2023 里 loadbalancer 不再是 openfeign 的自动传递依赖，
+             必须显式引入，否则启动报 "No Feign Client for loadBalancing defined" -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
