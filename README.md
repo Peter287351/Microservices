@@ -58,7 +58,7 @@
 - [x] **module-00-项目脚手架** —— Maven 父工程、common 公共模块、两个单体服务、MySQL 容器、GitHub 建仓
 - [x] **module-01-nacos-注册中心** —— 服务注册与发现，服务列表可视化
 - [x] **module-02-nacos-config-配置中心** —— 配置托管与动态刷新
-- [ ] **module-03-openfeign-服务调用** —— 下单时远程校验用户
+- [x] **module-03-openfeign-服务调用** —— 下单时远程校验用户
 - [ ] **module-04-loadbalancer-负载均衡** —— 双实例演示轮询与权重
 - [ ] **module-05-gateway-服务网关** —— 统一入口 8080，路由与过滤器
 - [ ] **module-06-sentinel-熔断降级** —— 限流、熔断、fallback 降级

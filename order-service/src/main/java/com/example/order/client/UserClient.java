@@ -22,4 +22,8 @@ public interface UserClient {
     /** 对应 user-service 的 UserController.getById()：GET /users/{id} */
     @GetMapping("/users/{id}")
     Result<UserDTO> getById(@PathVariable("id") Long id);
+
+    /** 对应 user-service 的 InstanceController.instanceInfo()：GET /users/instance-info（模块04实验用） */
+    @GetMapping("/users/instance-info")
+    Result<java.util.Map<String, Object>> getInstanceInfo();
 }
