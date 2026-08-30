@@ -8,6 +8,11 @@ server:
 spring:
   application:
     name: order-service     # 服务名：模块 01 注册到 Nacos 时用它
+  # ── 模块 01 新增：Nacos 注册中心 ──────────────────────────
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848   # Nacos 地址（容器映射到宿主机 8848）
   datasource:
     # 学习阶段两个服务共用 micro 库（表不同：t_user / t_order）；
     # 真实微服务推荐"一服务一库"，模块 09 讨论

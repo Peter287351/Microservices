@@ -9,6 +9,13 @@ server:
 spring:
   application:
     name: user-service      # 服务名：模块 01 注册到 Nacos 时的"身份证"，必须全局唯一
+  # ── 模块 01 新增：Nacos 注册中心 ──────────────────────────
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848   # Nacos 地址（容器映射到宿主机 8848）
+        # 服务启动后会把 "user-service + 自己的IP:8081" 注册上去，
+        # 并每 5 秒发一次心跳证明自己活着
   datasource:
     url: jdbc:mysql://localhost:3307/micro?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     #            └─ 库地址(容器 MySQL 映射到宿主机 3307，避开本机已占用的 3306)  └─ 时区：防止时间差 8 小时

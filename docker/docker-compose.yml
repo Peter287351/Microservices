@@ -9,6 +9,21 @@
 #   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
 
 services:
+  # ── 模块 01 新增：Nacos 注册中心 ──────────────────────────────
+  # 控制台：http://localhost:8848/nacos （账号密码 nacos/nacos）
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: micro-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone        # 单机模式（学习用；生产环境是 3 节点集群）
+      TZ: Asia/Shanghai
+      JVM_XMS: 256m           # 限制堆内存，学习环境不必占用太多资源
+      JVM_XMX: 512m
+    ports:
+      - "8848:8848"           # HTTP API + 控制台
+      - "9848:9848"           # gRPC 端口：客户端 2.x 注册/心跳全走它，规则=主端口+1000，少映射必报错
+
   mysql:
     image: mysql:8.0.36
     container_name: micro-mysql
