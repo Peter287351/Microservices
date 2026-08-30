@@ -9,6 +9,16 @@
 #   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
 
 services:
+  # ── 模块 06 新增：Sentinel 控制台 ────────────────────────────
+  # 控制台：http://localhost:8858 （账号密码 sentinel/sentinel）
+  sentinel-dashboard:
+    image: bladex/sentinel-dashboard:1.8.0
+    container_name: micro-sentinel
+    restart: unless-stopped
+    ports:
+      - "8858:8858"           # 控制台 Web
+      # 服务与本控制台的通信端口 8719 用默认值，未与宿主机端口冲突可不映射
+
   # ── 模块 01 新增：Nacos 注册中心 ──────────────────────────────
   # 控制台：http://localhost:8848/nacos （账号密码 nacos/nacos）
   nacos:

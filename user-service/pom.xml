@@ -53,6 +53,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
+        <!-- 熔断限流（模块 06）：Sentinel 客户端，让本服务出现在控制台并可被限流 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
         <!-- 公共模块：统一返回 Result、全局异常 -->
         <dependency>
             <groupId>com.example</groupId>

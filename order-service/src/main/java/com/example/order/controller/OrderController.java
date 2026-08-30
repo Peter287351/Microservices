@@ -1,5 +1,6 @@
 package com.example.order.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.example.common.api.Result;
 import com.example.order.client.UserClient;
 import com.example.order.dto.OrderCreateRequest;
@@ -33,10 +34,25 @@ public class OrderController {
         this.userClient = userClient;
     }
 
-    /** 下单：POST /orders */
+    /**
+     * 下单：POST /orders。
+     * @SentinelResource（模块 06）：把"createOrder"注册成 Sentinel 资源。
+     * 控制台给它配流控规则（如 QPS=1）后，超限的请求不再执行业务，
+     * 而是走 fallback 指向的兜底方法——限流时用户看到的是友好提示而非报错。
+     */
     @PostMapping
+    @SentinelResource(value = "createOrder", fallback = "createOrderFallback")
     public Result<Order> create(@Valid @RequestBody OrderCreateRequest request) {
         return Result.ok(orderService.create(request));
+    }
+
+    /**
+     * 下单的兜底方法（模块 06）：签名 = 原方法参数 + 末尾一个 Throwable，
+     * Sentinel 触发限流/熔断/业务异常时自动代替原方法执行。
+     * 注意：兜底方法必须在同一个类里，且签名不匹配就不生效（新手第一坑）。
+     */
+    public Result<Order> createOrderFallback(OrderCreateRequest request, Throwable t) {
+        return Result.fail(429, "下单太火爆啦，请稍后再试（Sentinel 已保护此接口）");
     }
 
     /** 查询订单：GET /orders/1 */

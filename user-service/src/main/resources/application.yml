@@ -18,6 +18,10 @@ spring:
   cloud:
     nacos:
       server-addr: localhost:8848   # 容器映射到宿主机 8848
+    # ── 模块 06 新增：Sentinel 控制台 ─────────────────────────
+    sentinel:
+      transport:
+        dashboard: localhost:8858
       # 服务启动后把 "user-service + IP:8081" 注册上去，并每 5 秒心跳证明自己活着
   datasource:
     url: jdbc:mysql://localhost:3307/micro?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
