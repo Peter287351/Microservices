@@ -1,12 +1,13 @@
 # ===================================================================
-# gateway-service 配置（模块 05）：全系统唯一入口
+# gateway-service 配置（模块 05→10）：全系统唯一入口 + 统一验票
 # 之后浏览器/Apifox 一律访问 http://localhost:8080，不再直连 8081/8082
+# ⚠️ YAML 顶层键（server/management/spring）各只能出现一次（E10-2 教训）
 # ===================================================================
 
 server:
   port: 8080
 
-# ── 模块 07 新增：链路追踪（trace 从大门就开始记录）─────────
+# ── 模块 07：链路追踪（trace 从大门就开始记录）──────────────
 management:
   tracing:
     sampling:
@@ -15,18 +16,16 @@ management:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
 
-# ── 模块 10 新增：JWT 验签密钥（与 auth-service 一致，HS256 对称密钥）──
-# ⚠️ 学习环境明文；生产放配置中心/密钥管理，且建议 RS256 公私钥分离
 spring:
+  application:
+    name: gateway-service
+  # ── 模块 10：JWT 验签密钥（与 auth-service 一致，HS256 对称密钥）──
+  # ⚠️ 学习环境明文；生产放配置中心/密钥管理，且建议 RS256 公私钥分离
   security:
     oauth2:
       resourceserver:
         jwt:
           secret-key: "micro-learning-secret-key-0123456789abcdef0123456789abcdef"
-
-spring:
-  application:
-    name: gateway-service
   cloud:
     nacos:
       server-addr: localhost:8848        # 注册自己 + 发现下游服务
