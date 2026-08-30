@@ -64,10 +64,18 @@ public class OrderService {
         // 模块 08：下单成功后发布"订单已创建"事件（异步广播，不阻塞下单响应）。
         // StreamBridge 把事件发往 orderCreated-out-0 通道 → RocketMQ 的 order-created-topic，
         // 谁关心谁订阅（目前 user-service 消费它做后续动作，如加积分、发通知）。
+        //
+        // 注意（E08-3 教训）：MQ 发送失败【不能让下单失败】——订单是主业务，事件是附属品。
+        // 这里选择"记录错误、继续返回"；生产环境的正确姿势是"本地消息表/事务消息"保证事件最终不丢。
         OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getOrderNo(),
                 saved.getUserId(), saved.getProductName(), saved.getAmount(), saved.getCreatedAt());
-        boolean sent = streamBridge.send("orderCreated-out-0", event);
-        log.info("订单创建事件{}：orderNo={}", sent ? "已发送" : "发送失败", saved.getOrderNo());
+        try {
+            boolean sent = streamBridge.send("orderCreated-out-0", event);
+            log.info("订单创建事件{}：orderNo={}", sent ? "已发送" : "发送失败", saved.getOrderNo());
+        } catch (Exception e) {
+            log.error("订单创建事件发送失败（MQ 不可用）。订单已正常创建：orderNo={}，" +
+                    "生产环境应用本地消息表/事务消息保证事件不丢", saved.getOrderNo(), e);
+        }
         return saved;
     }
 
