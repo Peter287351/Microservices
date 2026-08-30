@@ -75,6 +75,17 @@
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- Lombok 显式升级到 1.18.36（E08-2）：
+                 Boot 3.2.4 BOM 管理的是 1.18.30（最高支持 JDK 21），
+                 IDEA 里 Maven 用 JDK 23 编译时 Lombok 注解处理失败，
+                 getter/setter 不生成 → 大面积"找不到符号"。
+                 注意：scope=import 的 BOM 不继承外部属性覆盖，
+                 所以必须在这里直接声明 dependencyManagement 条目才能盖过 BOM 的版本 -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.36</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
