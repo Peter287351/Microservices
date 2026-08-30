@@ -116,6 +116,14 @@ docker ps        # 应看到 namesrv / broker / dashboard 三个新容器
 ```
 控制台 http://localhost:8180 （集群页能看到 broker-a = host.docker.internal:10911）。
 
+### 第 1.5 步：手动创建 Topic（重要！）
+自动建 Topic 在容器版 5.x 上不生效（踩坑实录见错误知识库 E08-3），生产规范也是手动建：
+```bash
+docker exec micro-rocketmq-broker sh mqadmin updateTopic -n rocketmq-namesrv:9876 -b 192.168.85.1:10911 -t order-created-topic -r 8 -w 8
+# 验证路由已生成（能看到 brokerDatas 即成功）
+docker exec micro-rocketmq-namesrv sh mqadmin topicRoute -n localhost:9876 -t order-created-topic
+```
+
 ### 第 2 步：重启两个服务（Maven 刷新后）
 IDEA 重启 UserApplication、OrderApplication。启动日志搜 `orderCreated` 确认绑定成功。
 
