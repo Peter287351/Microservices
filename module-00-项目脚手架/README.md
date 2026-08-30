@@ -217,7 +217,7 @@ curl http://localhost:8082/orders           # → code 400 缺少必填参数
 2. Repository name 填 `Microservices`，选 **Private**，**不要**勾选任何初始化文件（README/.gitignore 都不要，本地已有）→ `Create repository`；
 3. 本机生成 SSH 密钥并添加到 GitHub：
    ```bash
-   ssh-keygen -t ed25519 -C "3021302329@qq.com"   # 一路回车即可
+   ssh-keygen -t ed25519 -C "你的邮箱@example.com"   # 换成你自己的邮箱；一路回车即可
    cat ~/.ssh/id_ed25519.pub                       # 复制输出的整行公钥
    ```
    GitHub 网页：`Settings → SSH and GPG keys → New SSH key` → 粘贴公钥 → `Add`；

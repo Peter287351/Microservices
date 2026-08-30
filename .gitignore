@@ -21,6 +21,20 @@ logs/
 *.log
 tmp/
 
+# ---- 隐私与密钥（永远不进 git）----
+# 环境变量文件：生产上把数据库密码等写在 .env 里（docker-compose 支持 env_file 引用）
+.env
+*.env
+# 证书与私钥
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+# SSH 相关
+id_rsa*
+id_ed25519*
+
 # ---- 操作系统 ----
 .DS_Store
 Thumbs.db
