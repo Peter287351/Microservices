@@ -6,6 +6,16 @@
 server:
   port: 8081                # 服务监听端口
 
+# ── 模块 09 新增：Seata 分布式事务 ─────────────────────────
+seata:
+  tx-service-group: default_tx_group
+  service:
+    vgroup-mapping:
+      default_tx_group: default
+    grouplist:
+      default: 127.0.0.1:8091
+  data-source-proxy-mode: AT
+
 spring:
   application:
     name: user-service      # 服务名：模块 01 注册到 Nacos 时的"身份证"，必须全局唯一

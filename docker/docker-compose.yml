@@ -9,6 +9,15 @@
 #   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
 
 services:
+  # ── 模块 09 新增：Seata 事务协调器（TC）─────────────────────
+  seata-server:
+    image: seataio/seata-server:2.0.0
+    container_name: micro-seata
+    restart: unless-stopped
+    ports:
+      - "8091:8091"           # TC 服务端口：各服务的事务协调都连这里
+      - "7091:7091"           # 控制台 UI：http://localhost:7091（seata/seata）
+
   # ── 模块 08 新增：RocketMQ（NameServer + Broker + 控制台）────
   rocketmq-namesrv:
     image: apache/rocketmq:5.1.3

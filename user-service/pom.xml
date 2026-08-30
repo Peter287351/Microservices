@@ -63,6 +63,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
         </dependency>
+        <!-- 分布式事务（模块 09）：Seata 客户端（TM/RM 能力 + 数据源自动代理） -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        </dependency>
         <!-- 链路追踪（模块 07）：Micrometer Tracing + Brave 桥 + Zipkin 上报。
              actuator 暴露健康/信息端点，追踪也依赖它 -->
         <dependency>

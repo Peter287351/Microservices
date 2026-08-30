@@ -1,6 +1,7 @@
 package com.example.order.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.example.common.api.BusinessException;
 import com.example.common.api.Result;
 import com.example.order.client.UserClient;
 import com.example.order.dto.OrderCreateRequest;
@@ -47,11 +48,15 @@ public class OrderController {
     }
 
     /**
-     * 下单的兜底方法（模块 06）：签名 = 原方法参数 + 末尾一个 Throwable，
-     * Sentinel 触发限流/熔断/业务异常时自动代替原方法执行。
-     * 注意：兜底方法必须在同一个类里，且签名不匹配就不生效（新手第一坑）。
+     * 下单的兜底方法（模块 06/09）：签名 = 原方法参数 + 末尾一个 Throwable。
+     * 精细化（模块 09）：业务异常（如风控拦截、余额不足）如实上抛给全局异常处理器，
+     * 返回真实错误码；只有限流/熔断/基础设施异常才给友好兜底——
+     * 否则"风控拦截"也会被伪装成"下单太火爆"，误导排查。
      */
     public Result<Order> createOrderFallback(OrderCreateRequest request, Throwable t) {
+        if (t instanceof BusinessException businessException) {
+            throw businessException;
+        }
         return Result.fail(429, "下单太火爆啦，请稍后再试（Sentinel 已保护此接口）");
     }
 

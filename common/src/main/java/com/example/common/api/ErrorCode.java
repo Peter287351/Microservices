@@ -14,6 +14,7 @@ public enum ErrorCode {
     // ── 用户服务业务错误 1xxx ──
     USER_NOT_FOUND(1001, "用户不存在"),
     USERNAME_DUPLICATED(1002, "用户名已存在"),
+    BALANCE_NOT_ENOUGH(1003, "账户余额不足"),
 
     // ── 订单服务业务错误 2xxx ──
     ORDER_NOT_FOUND(2001, "订单不存在");

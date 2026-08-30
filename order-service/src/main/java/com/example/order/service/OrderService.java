@@ -9,11 +9,11 @@ import com.example.order.dto.OrderCreateRequest;
 import com.example.order.dto.UserDTO;
 import com.example.order.entity.Order;
 import com.example.order.repository.OrderRepository;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,9 +49,23 @@ public class OrderService {
      * Feign 动态代理 → 拿服务名查 Nacos（模块01的电话簿）→ LoadBalancer 选一个实例
      * → 发 HTTP GET http://192.168.x.x:8081/users/{id} → 拿回 JSON 反序列化成 Result<UserDTO>
      */
-    @Transactional
+    /**
+     * 下单（模块 09 微服务版）：扣账户余额 + 创建订单，两个服务的两次写【同生共死】。
+     *
+     * @GlobalTransactional：本方法是全局事务发起方（TM）。
+     *  分支①：user-service 扣余额（UPDATE t_account，Seata 数据源代理自动写 undo_log）
+     *  分支②：order-service 插订单（INSERT t_order，同上）
+     *  任一环节抛异常 → TM 通知 TC 全局回滚 → 两个分支按 undo_log 镜像逆向补偿。
+     *
+     * 失败注入：商品名包含"炸弹" = 模拟"扣款成功后、订单提交前"的突发失败，
+     * 没有全局事务时会造成"钱扣了、单没建"的数据不一致——有 Seata 则双双回滚。
+     */
+    @GlobalTransactional(rollbackFor = Exception.class)
     public Order create(OrderCreateRequest request) {
         validateUser(request.userId());
+
+        // 分支①：远程扣减账户余额（Feign 请求头自动携带全局事务 XID）
+        userClient.deductBalance(request.userId(), request.amount());
 
         Order order = new Order();
         order.setOrderNo(generateOrderNo());
@@ -61,10 +75,12 @@ public class OrderService {
         order.setStatus("CREATED");
         Order saved = orderRepository.save(order);
 
+        // 失败注入（模块 09）：验证全局回滚
+        if (request.productName().contains("炸弹")) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "风控拦截：模拟下单失败，验证全局回滚");
+        }
+
         // 模块 08：下单成功后发布"订单已创建"事件（异步广播，不阻塞下单响应）。
-        // StreamBridge 把事件发往 orderCreated-out-0 通道 → RocketMQ 的 order-created-topic，
-        // 谁关心谁订阅（目前 user-service 消费它做后续动作，如加积分、发通知）。
-        //
         // 注意（E08-3 教训）：MQ 发送失败【不能让下单失败】——订单是主业务，事件是附属品。
         // 这里选择"记录错误、继续返回"；生产环境的正确姿势是"本地消息表/事务消息"保证事件最终不丢。
         OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getOrderNo(),

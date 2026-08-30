@@ -5,6 +5,16 @@
 server:
   port: 8082                # 订单服务端口，与用户服务 8081 区分开
 
+# ── 模块 09 新增：Seata 分布式事务 ─────────────────────────
+seata:
+  tx-service-group: default_tx_group     # 事务组名（TM 用它找 TC）
+  service:
+    vgroup-mapping:
+      default_tx_group: default          # 事务组 → 逻辑集群名
+    grouplist:
+      default: 127.0.0.1:8091            # TC（seata-server 容器）直连地址
+  data-source-proxy-mode: AT             # AT 模式：自动代理数据源，写 undo_log 回滚镜像
+
 spring:
   application:
     name: order-service     # 服务名：模块 01 注册到 Nacos 时用它
