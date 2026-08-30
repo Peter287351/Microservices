@@ -3,11 +3,15 @@ package com.example.order.service;
 import com.example.common.api.BusinessException;
 import com.example.common.api.ErrorCode;
 import com.example.common.api.Result;
+import com.example.common.event.OrderCreatedEvent;
 import com.example.order.client.UserClient;
 import com.example.order.dto.OrderCreateRequest;
 import com.example.order.dto.UserDTO;
 import com.example.order.entity.Order;
 import com.example.order.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +21,16 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
     private final OrderRepository orderRepository;
     private final UserClient userClient;
+    private final StreamBridge streamBridge;
 
-    public OrderService(OrderRepository orderRepository, UserClient userClient) {
+    public OrderService(OrderRepository orderRepository, UserClient userClient, StreamBridge streamBridge) {
         this.orderRepository = orderRepository;
         this.userClient = userClient;
+        this.streamBridge = streamBridge;
     }
 
     public Order getById(Long id) {
@@ -51,7 +59,16 @@ public class OrderService {
         order.setProductName(request.productName());
         order.setAmount(request.amount());
         order.setStatus("CREATED");
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        // 模块 08：下单成功后发布"订单已创建"事件（异步广播，不阻塞下单响应）。
+        // StreamBridge 把事件发往 orderCreated-out-0 通道 → RocketMQ 的 order-created-topic，
+        // 谁关心谁订阅（目前 user-service 消费它做后续动作，如加积分、发通知）。
+        OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getOrderNo(),
+                saved.getUserId(), saved.getProductName(), saved.getAmount(), saved.getCreatedAt());
+        boolean sent = streamBridge.send("orderCreated-out-0", event);
+        log.info("订单创建事件{}：orderNo={}", sent ? "已发送" : "发送失败", saved.getOrderNo());
+        return saved;
     }
 
     /** 远程校验用户：对方返回非 0 错误码或没数据，都视为"用户不存在" */

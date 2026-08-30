@@ -21,6 +21,14 @@ spring:
       transport:
         dashboard: localhost:8858   # 控制台地址（Docker 映射）
       # 注意：控制台是"懒加载"——服务要先被请求至少一次，控制台里才会出现它
+    # ── 模块 08 新增：Stream + RocketMQ（事件生产方）──────────
+    stream:
+      rocketmq:
+        binder:
+          name-server: localhost:9876   # RocketMQ NameServer（Docker 映射）
+      bindings:
+        orderCreated-out-0:             # 出站通道：StreamBridge.send 用这个名字
+          destination: order-created-topic   # 消息发往的 Topic（自动创建）
   datasource:
     # 学习阶段两个服务共用 micro 库（表不同：t_user / t_order）；
     # 真实微服务推荐"一服务一库"，模块 09 讨论

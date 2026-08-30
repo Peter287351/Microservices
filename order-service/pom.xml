@@ -55,6 +55,18 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+        <!-- 链路追踪（E07-1 修复）：Feign 的埋点模块。没有它，Feign 出站调用
+             既不产生 Span，也不在请求头携带 TraceId，导致下游 trace 断裂成两条 -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-micrometer</artifactId>
+        </dependency>
+        <!-- 消息驱动（模块 08）：Spring Cloud Stream 的 RocketMQ 绑定器。
+             Stream 屏蔽 MQ 细节：以后换 Kafka/RabbitMQ 只换绑定器，业务代码不动 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>

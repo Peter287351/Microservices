@@ -58,6 +58,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
+        <!-- 消息驱动（模块 08）：消费 order-service 发出的"订单创建事件" -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
+        </dependency>
         <!-- 链路追踪（模块 07）：Micrometer Tracing + Brave 桥 + Zipkin 上报。
              actuator 暴露健康/信息端点，追踪也依赖它 -->
         <dependency>

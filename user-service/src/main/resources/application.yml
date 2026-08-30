@@ -22,6 +22,17 @@ spring:
     sentinel:
       transport:
         dashboard: localhost:8858
+    # ── 模块 08 新增：Stream + RocketMQ（事件消费方）──────────
+    function:
+      definition: orderCreated        # 声明函数式消费者（Bean 的名字）
+    stream:
+      rocketmq:
+        binder:
+          name-server: localhost:9876
+      bindings:
+        orderCreated-in-0:            # 入站通道：函数名 + "-in-0"
+          destination: order-created-topic   # 订阅的 Topic，与生产方一致
+          group: user-service-group    # 消费者组：同组内负载均衡，不同组各自收一份
       # 服务启动后把 "user-service + IP:8081" 注册上去，并每 5 秒心跳证明自己活着
   datasource:
     url: jdbc:mysql://localhost:3307/micro?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
