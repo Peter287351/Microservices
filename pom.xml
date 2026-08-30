@@ -18,12 +18,13 @@
     <name>microservices</name>
     <description>电商微服务学习项目：从单体到微服务架构演进</description>
 
-    <!-- 当前阶段的子模块，后续模块会逐步追加 auth-service -->
+    <!-- 当前阶段的子模块 -->
     <modules>
         <module>common</module>
         <module>user-service</module>
         <module>order-service</module>
         <module>gateway-service</module>
+        <module>auth-service</module>
     </modules>
 
     <properties>

@@ -53,6 +53,7 @@ services:
       - rocketmq-namesrv
     environment:
       JAVA_OPTS: "-Drocketmq.namesrv.addr=rocketmq-namesrv:9876"
+      SERVER_PORT: "8080"     # 该镜像默认起在 8082（E08-4），显式钉回 8080 才能命中 8180:8080 映射
     ports:
       - "8180:8080"           # 控制台：http://localhost:8180
 

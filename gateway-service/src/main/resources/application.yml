@@ -15,6 +15,15 @@ management:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
 
+# ── 模块 10 新增：JWT 验签密钥（与 auth-service 一致，HS256 对称密钥）──
+# ⚠️ 学习环境明文；生产放配置中心/密钥管理，且建议 RS256 公私钥分离
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: "micro-learning-secret-key-0123456789abcdef0123456789abcdef"
+
 spring:
   application:
     name: gateway-service
@@ -36,6 +45,18 @@ spring:
             - Path=/api/orders/**
           filters:
             - StripPrefix=1              # /api/orders?userId=1 → /orders?userId=1
+        - id: user-account-route
+          uri: lb://user-service
+          predicates:
+            - Path=/api/accounts/**      # 模块09 补的路由：账户余额接口（此前 404 的原因）
+          filters:
+            - StripPrefix=1
+        - id: auth-service-route
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**          # 登录接口：网关唯一放行（无需令牌）的入口（模块10）
+          filters:
+            - StripPrefix=1              # /api/auth/login → /auth/login
 
 # 对照记忆：
 #   以前直连：http://localhost:8081/users/1

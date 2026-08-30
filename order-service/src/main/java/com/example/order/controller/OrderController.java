@@ -49,13 +49,16 @@ public class OrderController {
 
     /**
      * 下单的兜底方法（模块 06/09）：签名 = 原方法参数 + 末尾一个 Throwable。
-     * 精细化（模块 09）：业务异常（如风控拦截、余额不足）如实上抛给全局异常处理器，
-     * 返回真实错误码；只有限流/熔断/基础设施异常才给友好兜底——
-     * 否则"风控拦截"也会被伪装成"下单太火爆"，误导排查。
+     * 精细化（模块 09 实战修正）：Seata 会把业务异常包进 ExecutionException 再传给 fallback，
+     * 直接 instanceof 判不到（实测返回了误导性的 429）——改为沿异常因果链逐层解包，
+     * 找到业务异常（风控拦截/余额不足）就如实上抛给全局异常处理器；
+     * 其余（限流/熔断/基础设施）才给友好兜底。
      */
     public Result<Order> createOrderFallback(OrderCreateRequest request, Throwable t) {
-        if (t instanceof BusinessException businessException) {
-            throw businessException;
+        for (Throwable cur = t; cur != null; cur = cur.getCause()) {
+            if (cur instanceof BusinessException businessException) {
+                throw businessException;
+            }
         }
         return Result.fail(429, "下单太火爆啦，请稍后再试（Sentinel 已保护此接口）");
     }

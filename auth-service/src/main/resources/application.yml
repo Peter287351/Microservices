@@ -1,0 +1,19 @@
+# ===================================================================
+# auth-service 配置（模块 10）：登录 + 签发 JWT
+# ===================================================================
+
+server:
+  port: 9000
+
+jwt:
+  # HS256 对称密钥：至少 32 字节。⚠️ 网关里配的是同一个值（两边用它验签/签发）。
+  # 生产环境应放配置中心/密钥管理系统，绝不入库入仓（模块 02 Q3 的答案）
+  secret: "micro-learning-secret-key-0123456789abcdef0123456789abcdef"
+  expire-minutes: 120      # 令牌有效期 2 小时（短时效降低泄漏风险）
+
+spring:
+  application:
+    name: auth-service
+  cloud:
+    nacos:
+      server-addr: localhost:8848
