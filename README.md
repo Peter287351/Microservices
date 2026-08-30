@@ -65,7 +65,7 @@
 - [x] **module-07-zipkin-链路追踪** —— 全链路 Trace 可视化
 - [x] **module-08-stream-rocketmq-消息驱动** —— 下单事件异步解耦
 - [x] **module-09-seata-分布式事务** —— 跨服务数据一致性
-- [ ] **module-10-security-jwt-安全认证** —— 授权服务器 + 网关统一鉴权
+- [x] **module-10-security-jwt-安全认证** —— 授权服务器 + 网关统一鉴权
 - [ ] **module-99-结课综合实战** —— 全链路串联复盘（网关→鉴权→下单→Feign→Seata→MQ）
 
 ## 四、每个模块怎么学（固定节奏）
