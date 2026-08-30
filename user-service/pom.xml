@@ -48,6 +48,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+        <!-- 配置中心（模块 02）：从 Nacos 拉取配置 + 监听变更动态刷新 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!-- 公共模块：统一返回 Result、全局异常 -->
         <dependency>
             <groupId>com.example</groupId>
