@@ -1,0 +1,41 @@
+# ===================================================================
+# inventory-service 配置（端口 8084，MyBatis-Plus 技术栈）
+# 分关区块：Stage 1 必须完成；Stage 2 起才用到 Redis（懒加载不阻塞启动）
+# ===================================================================
+
+server:
+  port: 8084
+
+spring:
+  application:
+    name: inventory-service          # 服务名：order-service 的 Feign 将按此名调用
+  # ── [Stage-1 TODO] 注册中心接入 ─────────────────────────────
+  #  TODO [Stage-1]: 参照 user-service 的写法补齐 Nacos 注册配置。
+  #  思考点：为什么这里不需要配 config.import？（答不上来就翻 module-02）
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+  # ── 数据源（与各服务共用 micro 库；库存表 t_inventory 由 02-stage-init.sql 建）──
+  datasource:
+    url: jdbc:mysql://localhost:3307/micro?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # ── [Stage-2 TODO] Redis（Token 令牌幂等用）──────────────────
+  #  默认连 localhost:6379；连接懒加载——Redis 没起服务也能正常启动（先体验再配）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# ── MyBatis-Plus 基础配置 ──────────────────────────────────────
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true   # 数据库下划线列 ↔ Java 驼峰属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   # 打印 SQL（学习用）
+  global-config:
+    db-config:
+      id-type: auto                      # 主键走数据库自增
+
+# ── [Stage-2 预告] 以下依赖/配置到 Stage 2 才启用 ────────────────
+#  spring.cloud.openfeign / sentinel 等：见对应关卡手册的任务清单

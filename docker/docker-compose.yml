@@ -9,6 +9,15 @@
 #   docker compose -f docker/docker-compose.yml down       # 停止（数据保留在卷里）
 
 services:
+  # ── Stage 2 新增：Redis（Token 令牌幂等）────────────────────
+  redis:
+    image: redis:7.2-alpine        # alpine 版 ~15MB，不额外占空间
+    container_name: micro-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+
   # ── 模块 09 新增：Seata 事务协调器（TC）─────────────────────
   seata-server:
     image: seataio/seata-server:2.0.0

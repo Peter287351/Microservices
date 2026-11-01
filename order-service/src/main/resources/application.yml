@@ -5,6 +5,23 @@
 server:
   port: 8082                # 订单服务端口，与用户服务 8081 区分开
 
+# ── [Stage-1 TODO] Feign 超时与重试边界（旧工程从未配置过，默认 connect 10s/read 60s）──
+#  TODO [Stage-1]: 去掉注释并填入你认为合理的数值（毫秒），在注释里写理由：
+#  思考点① 为什么下游超时要 < 上游超时？（超时逐层递减，避免上游还在等、下游已放弃）
+#  思考点② 读超时设短了会误杀慢请求，设长了会拖垮上游——你的依据是什么？
+# spring:
+#   cloud:
+#     openfeign:
+#       client:
+#         config:
+#           user-service:
+#             connect-timeout: ____      # TODO
+#             read-timeout: ____         # TODO
+#           inventory-service:
+#             connect-timeout: ____
+#             read-timeout: ____
+#  （Retryer 默认 NEVER_RETRY，Stage 2 会讲为什么绝不轻易打开）
+
 # ── 模块 09 新增：Seata 分布式事务 ─────────────────────────
 seata:
   tx-service-group: default_tx_group     # 事务组名（TM 用它找 TC）

@@ -18,13 +18,14 @@
     <name>microservices</name>
     <description>电商微服务学习项目：从单体到微服务架构演进</description>
 
-    <!-- 当前阶段的子模块 -->
+    <!-- 当前阶段的子模块：inventory-service 为五关进阶训练新增（MyBatis-Plus 技术栈） -->
     <modules>
         <module>common</module>
         <module>user-service</module>
         <module>order-service</module>
         <module>gateway-service</module>
         <module>auth-service</module>
+        <module>inventory-service</module>
     </modules>
 
     <properties>
@@ -86,6 +87,13 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>1.18.36</version>
+            </dependency>
+            <!-- 五关进阶（Stage 1+）：MyBatis-Plus for Spring Boot 3（大厂主流 ORM）
+                 ⚠️ Boot3 必须用 spring-boot3-starter 变体，用错 starter 会导致启动无 Mapper -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>3.5.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

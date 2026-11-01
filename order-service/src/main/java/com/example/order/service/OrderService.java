@@ -63,6 +63,10 @@ public class OrderService {
     @GlobalTransactional(rollbackFor = Exception.class)
     public Order create(OrderCreateRequest request) {
         validateUser(request.userId());
+        // TODO [Stage-2]: 在此处接入 InventoryClient.deductStock（幂等键=requestId，
+        //  由前端/网关生成；现在还没有任何幂等防线——重复点击会重复下单+重复扣库存）
+        // TODO [Stage-3]: 接入后思考：这个 Feign 调用与 ①②两次写库都在全局事务内，
+        //  事务时长被拉长了多少？连接占用与全局锁的代价是什么？（手册 03 §1.2）
 
         // 分支①：远程扣减账户余额（Feign 请求头自动携带全局事务 XID）
         userClient.deductBalance(request.userId(), request.amount());
@@ -83,6 +87,10 @@ public class OrderService {
         // 模块 08：下单成功后发布"订单已创建"事件（异步广播，不阻塞下单响应）。
         // 注意（E08-3 教训）：MQ 发送失败【不能让下单失败】——订单是主业务，事件是附属品。
         // 这里选择"记录错误、继续返回"；生产环境的正确姿势是"本地消息表/事务消息"保证事件最终不丢。
+        // TODO [Stage-3]: 以下 MQ 发送处于【全局事务边界内】——这是本仓库真实存在的反模式：
+        //  ① 事务持连接期间做网络 IO，事务时长被拉长（Stage 3 §1.2 连接池打满事故链）
+        //  ② 发出去的是"可能未提交"的订单（若后续回滚 → 幽灵消息）
+        //  Stage 3 将用【本地消息表】重构：事务内只落 PENDING 消息，事务外异步投递。
         OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getOrderNo(),
                 saved.getUserId(), saved.getProductName(), saved.getAmount(), saved.getCreatedAt());
         try {
